@@ -1,6 +1,6 @@
 package com.srm.user.model;
 
-import java.util.List;
+import com.srm.user.model.entity.UserClass;
 
 public class UpdateUser {
 

@@ -1,4 +1,4 @@
-package com.srm.user.model;
+package com.srm.user.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,20 +11,20 @@ import lombok.*;
 public class UserClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public  int id;
+    private Integer id;
 
     @Column
-    public String name;
+    private String name;
 
     @Column
-    public String email;
+    private String email;
 
     @Column
-    public String password;
+    private String password;
 
     @Column
-    public String phone_number;
+    private String phoneNumber;
 
     @Column
-    public String address;
+    private String address;
 }

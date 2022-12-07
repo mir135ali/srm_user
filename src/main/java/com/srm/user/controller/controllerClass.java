@@ -1,13 +1,15 @@
 package com.srm.user.controller;
 
-import com.srm.user.Exception.UserException;
-import com.srm.user.model.UpdateUser;
-import com.srm.user.model.UserClass;
+import com.srm.user.model.entity.UserClass;
+import com.srm.user.model.payload.CreateUserPayload;
+import com.srm.user.model.response.UserResponse;
 import com.srm.user.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController()
+@RequestMapping(value = "/user")
 public class controllerClass {
 
     @Autowired
@@ -19,15 +21,18 @@ public class controllerClass {
         return  loginService.getUser(userReq);
     }
 
+    @PostMapping(value = "/update")
+    public String updateUser(@RequestBody UserClass userRequest) {
+         return loginService.updateUser(userRequest);
+    }
+
+//    @PutMapping(value = "/update")
+//    public UserClass update(@RequestBody UpdateUser userReq) throws UserException {
+//        return loginService.updateUser(userReq);
+//    }
+
     @PostMapping(value = "/create")
-    public String postMapping(@RequestBody UserClass userRequest) {
-         return loginService.createUser(userRequest);
+    public UserResponse createUser(@RequestBody @Validated CreateUserPayload request) throws Exception {
+        return loginService.createUser(request);
     }
-
-    @PutMapping(value = "/update")
-    public UserClass update(@RequestBody UpdateUser userReq) throws UserException {
-        return loginService.updateUser(userReq);
-    }
-
-
 }
