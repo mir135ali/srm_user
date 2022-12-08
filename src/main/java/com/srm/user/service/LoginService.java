@@ -1,13 +1,17 @@
 package com.srm.user.service;
 
 import com.srm.user.Exception.BadRequestException;
+import com.srm.user.Exception.UserException;
 import com.srm.user.model.entity.UserClass;
 import com.srm.user.model.payload.CreateUserPayload;
+import com.srm.user.model.payload.GetUserPayload;
+import com.srm.user.model.payload.UpdateUserPayload;
 import com.srm.user.model.response.UserResponse;
 import com.srm.user.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @Slf4j
@@ -18,37 +22,28 @@ public class LoginService {
 
 //    private static final Logger logger = (Logger) LoggerFactory.getLogger(LoginService.class);
 
-    public UserClass getUser(UserClass userRequest){
-        String email = userRequest.getEmail();
-        String pwd = userRequest.getPassword();
+    public UserResponse getUser(GetUserPayload req) throws Exception{
+        String email = req.getEmail();
+        String password = req.getPassword();
 
-        if(email== null ){
+        if(email== null || password==null){
+            throw  new BadRequestException("Please enter proper field");
+        }
+        UserClass user = userRepo.findByEmail(email);
+        if(ObjectUtils.isEmpty(user)){
+            throw new UserException("user not found");
+        }
+        UserResponse userResponse = new UserResponse();
 
-            return null;
-        }
-        else {
-            UserClass user = userRepo.findByEmail(email);
-            return user;
-        }
+        userResponse.setUserId(user.getId());
+        userResponse.setAddress(user.getAddress());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setName(user.getName());
+        userResponse.setPhone(user.getPhoneNumber());
+        userResponse.setPassword(user.getPassword());
+        return userResponse;
     }
-    public String updateUser(UserClass userRequest){
-        try{
-            String email = userRequest.getEmail();
-            String name = userRequest.getName();
-            if(email == null || name== null){
-                return "bad reqiest";
-            }
-            else{
-                userRepo.save(userRequest);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
 
-        }
-        return "success created";
-
-
-    }
 
     public UserResponse createUser(CreateUserPayload userPayload) throws Exception {
         if(userPayload == null){
@@ -74,23 +69,59 @@ public class LoginService {
         return userResponse;
     }
 
-//    public UserClass updateUser(UpdateUser userRequest) throws UserException {
-//
-//        try{
-//            String email = userRequest.getEmail();
-//            UserClass user = userRepo.findByEmail(email);
-//            if(user==null){
-//                throw new UserException("user not found");
-//            }
-//            else{
-//
-//            }
-//            return null;
-//
-//        }
-//        catch (Exception e){
-//            throw new UserException("user not found");
-//        }
-//
-//    }
+    public UserResponse updateUser(UpdateUserPayload req) throws Exception{
+
+        String email = req.getEmail();
+        if(email==null){
+            throw  new BadRequestException("no email");
+        }
+        UserClass user = userRepo.findByEmail(email);
+        if(user==null){
+            throw new UserException("user not found");
+        }
+        else{
+            UserClass userObj = new UserClass();
+
+            if (req.getAddress() != null) {
+                userObj.setAddress(req.getAddress());
+            } else {
+                userObj.setAddress(user.getAddress());
+            }
+
+            if(req.getName()!=null){
+                userObj.setName(req.getName());
+            } else {
+                userObj.setName(user.getName());
+            }
+            if(req.getPhone()!= null){
+                userObj.setPhoneNumber(req.getPhone());
+            }else{
+                userObj.setPhoneNumber(user.getPhoneNumber());
+            }
+
+            if(req.getPassword()!= null){
+                userObj.setPassword(req.getPassword());
+            } else {
+                userObj.setPassword(user.getPassword());
+            }
+            userObj.setEmail(user.getEmail());
+
+            userObj.setId(user.getId());
+
+            userRepo.save(userObj);
+
+
+            UserResponse response = new UserResponse();
+            UserClass user1 = userRepo.findByEmail(email);
+            response.setPassword(user1.getPassword());
+            response.setUserId(user1.getId());
+            response.setEmail(user1.getEmail());
+            response.setAddress(user1.getAddress());
+            response.setName(user1.getName());
+            response.setPhone(user1.getPhoneNumber());
+            return response;
+        }
+
+    }
+
 }

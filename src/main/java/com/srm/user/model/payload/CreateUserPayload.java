@@ -1,8 +1,10 @@
 package com.srm.user.model.payload;
 
-import jakarta.validation.constraints.NotNull;
+
 import lombok.Data;
 import lombok.NonNull;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 public class CreateUserPayload {
